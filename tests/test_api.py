@@ -14,7 +14,12 @@ def test_health_returns_ok():
 
 
 def test_investigate_returns_agent_result(monkeypatch):
-    from app.models import InvestigationResult
+    from app.models import (
+        FailureCategory,
+        InvestigationResult,
+        SettlementStatus,
+        TradeStatus,
+    )
 
     def fake_investigate_transaction(
         transaction_id: str,
@@ -22,9 +27,9 @@ def test_investigate_returns_agent_result(monkeypatch):
         assert transaction_id == "TX1001"
 
         return InvestigationResult(
-            trade_status="PENDING",
-            settlement_status="FAILED",
-            failure_category="SSI_MISMATCH",
+            trade_status=TradeStatus.PENDING,
+            settlement_status=SettlementStatus.FAILED,
+            failure_category=FailureCategory.SSI_MISMATCH,
             evidence=[
                 "Internal account: 12345678",
                 "Counterparty account: 87654321",

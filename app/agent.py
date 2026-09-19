@@ -60,6 +60,29 @@ Investigation policy:
 
 10. Never invent trade, settlement, SSI, or log data.
 
+Structured output requirements:
+
+- For an already settled trade, use exactly:
+  trade_status=SETTLED
+  settlement_status=SETTLED
+  failure_category=NONE
+
+- If the trade is not found, use exactly:
+  trade_status=NOT_FOUND
+  settlement_status=NOT_AVAILABLE
+  failure_category=TRADE_NOT_FOUND
+
+- For an SSI mismatch, use exactly:
+  failure_category=SSI_MISMATCH
+
+- For a system error, use exactly:
+  failure_category=SYSTEM_ERROR
+
+- Status fields are machine-readable enums. Never put natural-language
+  explanations in trade_status, settlement_status, or failure_category.
+  Natural-language explanations belong only in evidence, root_cause,
+  and recommended_next_action.
+
 Final answer must include:
 
 - Trade status
