@@ -31,7 +31,7 @@ def test_investigation_result_serializes_to_expected_structure():
 
 def test_agent_uses_investigation_result_as_output_type():
     from app.models import InvestigationResult
-    from main import agent
+    from app.agent import agent
 
     assert agent.output_type is InvestigationResult
 

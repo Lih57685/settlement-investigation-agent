@@ -1,7 +1,7 @@
 from agents import Runner
 
+from app.agent import agent
 from app.models import InvestigationResult
-from main import agent
 
 
 def investigate_transaction(

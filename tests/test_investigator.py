@@ -1,3 +1,8 @@
+import builtins
+import importlib
+import sys
+
+
 def test_investigate_transaction_calls_existing_agent(monkeypatch):
     from app.services import investigator
 
@@ -35,3 +40,19 @@ def test_investigate_transaction_declares_structured_return_type():
     )["return"]
 
     assert return_type is InvestigationResult
+
+
+def test_investigator_does_not_import_main(monkeypatch):
+    real_import = builtins.__import__
+
+    def import_without_main(name, *args, **kwargs):
+        if name == "main":
+            raise AssertionError("investigator must not import main")
+        return real_import(name, *args, **kwargs)
+
+    monkeypatch.setattr(builtins, "__import__", import_without_main)
+    sys.modules.pop("app.services.investigator", None)
+
+    investigator = importlib.import_module("app.services.investigator")
+
+    assert investigator.agent is not None
