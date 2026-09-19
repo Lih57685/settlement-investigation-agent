@@ -1,9 +1,12 @@
 from agents import Runner
 
+from app.models import InvestigationResult
 from main import agent
 
 
-def investigate_transaction(transaction_id: str) -> str:
+def investigate_transaction(
+    transaction_id: str,
+) -> InvestigationResult:
     result = Runner.run_sync(
         agent,
         f"Investigate trade {transaction_id}.",

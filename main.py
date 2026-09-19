@@ -3,6 +3,7 @@ import json
 from dotenv import load_dotenv
 from agents import Agent, Runner
 from agents.decorators import tool
+from app.models import InvestigationResult
 
 from db import (
     find_trade,
@@ -207,7 +208,7 @@ Final answer must include:
 - Root cause
 - Recommended next action
 """,
-
+    output_type=InvestigationResult,
     tools=[
         get_trade,
         get_settlement_status,

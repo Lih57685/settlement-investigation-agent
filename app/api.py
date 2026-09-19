@@ -1,7 +1,7 @@
 from fastapi import FastAPI, HTTPException
 #from pydantic import BaseModel
 from pydantic import BaseModel, field_validator
-
+from app.models import InvestigationResponse
 from app.services.investigator import investigate_transaction
 
 
@@ -32,8 +32,12 @@ class InvestigationRequest(BaseModel):
 def health_check():
     return {"status": "ok"}
 
+#@app.post("/investigate")
+@app.post(
+    "/investigate",
+    response_model=InvestigationResponse,
+)
 
-@app.post("/investigate")
 def investigate(request: InvestigationRequest):
     try:
         result = investigate_transaction(request.transaction_id)

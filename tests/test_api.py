@@ -14,9 +14,26 @@ def test_health_returns_ok():
 
 
 def test_investigate_returns_agent_result(monkeypatch):
-    def fake_investigate_transaction(transaction_id: str) -> str:
+    from app.models import InvestigationResult
+
+    def fake_investigate_transaction(
+        transaction_id: str,
+    ) -> InvestigationResult:
         assert transaction_id == "TX1001"
-        return "Investigation completed"
+
+        return InvestigationResult(
+            trade_status="PENDING",
+            settlement_status="FAILED",
+            failure_category="SSI_MISMATCH",
+            evidence=[
+                "Internal account: 12345678",
+                "Counterparty account: 87654321",
+            ],
+            root_cause="Settlement account mismatch",
+            recommended_next_action=(
+                "Confirm the correct SSI and retry settlement"
+            ),
+        )
 
     monkeypatch.setattr(
         api_module,
@@ -32,9 +49,21 @@ def test_investigate_returns_agent_result(monkeypatch):
     assert response.status_code == 200
     assert response.json() == {
         "transaction_id": "TX1001",
-        "result": "Investigation completed",
+        "result": {
+            "trade_status": "PENDING",
+            "settlement_status": "FAILED",
+            "failure_category": "SSI_MISMATCH",
+            "evidence": [
+                "Internal account: 12345678",
+                "Counterparty account: 87654321",
+            ],
+            "root_cause": "Settlement account mismatch",
+            "recommended_next_action": (
+                "Confirm the correct SSI and retry settlement"
+            ),
+        },
     }
-
+    
 @pytest.mark.parametrize(
     "transaction_id",
     [
@@ -65,3 +94,15 @@ def test_investigate_rejects_blank_transaction_id(
 
     assert response.status_code == 422
     assert calls == []
+
+def test_investigate_declares_structured_response_model():
+    from app.models import InvestigationResponse
+
+    investigate_route = next(
+        route
+        for route in api_module.app.routes
+        if route.path == "/investigate"
+        and "POST" in route.methods
+    )
+
+    assert investigate_route.response_model is InvestigationResponse

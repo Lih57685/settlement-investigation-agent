@@ -23,4 +23,15 @@ def test_investigate_transaction_calls_existing_agent(monkeypatch):
     assert result == "Investigation completed"
     assert calls["agent"] is fake_agent
     assert calls["prompt"] == "Investigate trade TX1001."
-    
+
+def test_investigate_transaction_declares_structured_return_type():
+    from typing import get_type_hints
+
+    from app.models import InvestigationResult
+    from app.services.investigator import investigate_transaction
+
+    return_type = get_type_hints(
+        investigate_transaction
+    )["return"]
+
+    assert return_type is InvestigationResult
