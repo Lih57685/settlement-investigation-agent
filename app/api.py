@@ -1,5 +1,6 @@
 from fastapi import FastAPI, HTTPException
-from pydantic import BaseModel
+#from pydantic import BaseModel
+from pydantic import BaseModel, field_validator
 
 from app.services.investigator import investigate_transaction
 
@@ -10,8 +11,21 @@ app = FastAPI(
 )
 
 
+#class InvestigationRequest(BaseModel):
+#    transaction_id: str
+
 class InvestigationRequest(BaseModel):
     transaction_id: str
+
+    @field_validator("transaction_id")
+    @classmethod
+    def validate_transaction_id(cls, value: str) -> str:
+        normalized_value = value.strip()
+
+        if not normalized_value:
+            raise ValueError("transaction_id must not be blank")
+
+        return normalized_value
 
 
 @app.get("/health")
